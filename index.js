@@ -50,7 +50,7 @@ class Gif {
 
     // Get GifEncoder instance
     if (!encoder) {
-      encoder = this.getEncoder(width, height, this.options.gifEncoder);
+      encoder = this.getEncoder(width, height, this.options.gifEncoderOptions);
       if (delay) encoder.setDelay(delay);
       if (repeat) encoder.setRepeat(repeat);
       if (quality) encoder.setQuality(quality);
