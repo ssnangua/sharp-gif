@@ -19,25 +19,25 @@ if (!fs.existsSync("./output")) fs.mkdirSync("./output");
   /**
    * Trace encoding progress
    */
-  const image = await GIF.createGif({ delay: 20 })
-    .addFrame(
-      fs.readdirSync("./frames").map((file) => sharp(`./frames/${file}`))
-    )
-    .toSharp(({ total, encoded }) => {
-      console.log(`${encoded}/${total}`);
-    });
-  image.toFile("./output/frames.gif");
+  // const image = await GIF.createGif({ delay: 20 })
+  //   .addFrame(
+  //     fs.readdirSync("./frames").map((file) => sharp(`./frames/${file}`))
+  //   )
+  //   .toSharp(({ total, encoded }) => {
+  //     console.log(`${encoded}/${total}`);
+  //   });
+  // image.toFile("./output/frames.gif");
   /**
    * Concat animated GIFs
    */
-  // const image = await GIF.createGif({
-  //   transparent: "#FFFFFF",
-  // })
-  //   .addFrame([
-  //     sharp("./1.gif", { animated: true }),
-  //     sharp("./2.gif", { animated: true }),
-  //     sharp("./3.gif", { animated: true }),
-  //   ])
-  //   .toSharp();
-  // image.toFile("./output/concat.gif");
+  const image = await GIF.createGif({
+    transparent: "#FFFFFF",
+  })
+    .addFrame([
+      sharp("./1.gif", { animated: true }),
+      sharp("./2.gif", { animated: true }),
+      sharp("./3.gif", { animated: true }),
+    ])
+    .toSharp();
+  image.toFile("./output/concat.gif");
 })();

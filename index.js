@@ -153,7 +153,13 @@ class Gif {
 
   async toSharp(progress, encoder) {
     const buffer = await this.toBuffer(progress, encoder);
-    return sharp(buffer, { animated: true, ...this.options.sharpOptions });
+    return sharp(buffer, {
+      animated: true,
+      ...this.options.sharpOptions,
+    }).gif({
+      loop: this.options.repeat || 0,
+      delay: this.options.delay,
+    });
   }
 }
 

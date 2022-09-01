@@ -74,7 +74,7 @@ const GIF = require("sharp-gif");
 
   // You can even concat animated GIFs
   const image = await GIF
-    .createGif()
+    .createGif({ transparent: "#FFFFFF", })
     .addFrame([
       sharp("./1.gif", { animated: true }),
       sharp("./2.gif", { animated: true }),
