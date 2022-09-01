@@ -2,13 +2,7 @@ const sharp = require("sharp");
 const GifEncoder = require("gif-encoder");
 
 class Gif {
-  /**
-   * Gif class
-   * @param {Object} options
-   * @param {Object} options.gifEncoder - GifEncoder options
-   * @param {Number} options.gifEncoder.highWaterMark - Number, in bytes, to store in internal buffer. Defaults to 64kB.
-   */
-  constructor(options) {
+  constructor(options = {}) {
     this.options = options;
     this.frames = [];
   }
