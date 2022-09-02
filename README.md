@@ -1,6 +1,6 @@
 # sharp-gif
 
-Generate animated GIF for [sharp](https://www.npmjs.com/package/sharp) base on [gif-encoder](https://www.npmjs.com/package/gif-encoder).
+Generate animated GIF/WebP for [sharp](https://www.npmjs.com/package/sharp) base on [gif-encoder](https://www.npmjs.com/package/gif-encoder).
 
 ![](1.gif) + ![](2.gif) + ![](3.gif) = ![](output/concat.gif)
 
@@ -11,6 +11,8 @@ npm install sharp-gif
 ```
 
 ## Usage
+
+### Generate animated GIF
 
 ```js
 const fs = require("fs");
@@ -28,6 +30,8 @@ const GIF = require("sharp-gif");
     ])
     .toSharp();
   image.toFile("./frames.gif");
+  // Can also generate an animated WebP
+  image.toFile("./frames.webp");
 
   // Options
   const gif = GIF.createGif({
@@ -84,6 +88,28 @@ const GIF = require("sharp-gif");
 })();
 ```
 
+### Processing GIF frames
+
+```js
+const sharp = require("sharp");
+const GIF = require("sharp-gif");
+
+(async () => {
+  const reader = GIF.readGif(sharp("./2.gif", { animated: true }));
+  const frames = await reader.toFrames();
+  frames.forEach((frame, index) => {
+    // You can process each frame here
+
+    // Or just simple output frame
+    frame.toFile(`./output/${("000" + index).substr(-4)}.png`);
+  });
+
+  const gif = await reader.toGif({ transparent: "#FFFFFF", });
+  const image = await gif.toSharp();
+  image.toFile("./output/remake.gif");
+})();
+```
+
 ## API
 
 ### `GIF.createGif(options?: Object): Gif`
@@ -107,7 +133,9 @@ Returns `Gif` - Return a instance of Gif Contains the following methods:
 
 #### `gif.addFrame(frame: Sharp | Sharp[]): Gif`
 
-- `frame` Object - An instance of Sharp, or an array of instance of Sharp.
+- `frame` (Sharp | Sharp[]) - An instance of Sharp, or an array of instance of Sharp.
+
+Returns `Gif` - Return the Gif instance for chaining.
 
 #### `gif.toSharp(progress?: Function, encoder?: GifEncoder): Promise<Sharp>`
 
@@ -127,4 +155,34 @@ Encode all frames and resolve with an animated GIF buffer.
 
 #### `gif.getEncoder(width: Number, height: Number, options?: Object): GIFEncoder`
 
-Create a instance of GIFEncoder. See [new GifEncoder](https://github.com/twolfson/gif-encoder#new-gifencoderwidth-height-options).
+Return a new instance of GIFEncoder. See [new GifEncoder](https://github.com/twolfson/gif-encoder#new-gifencoderwidth-height-options).
+
+### `GIF.readGif(image: Sharp): GifReader`
+
+- `image` Sharp - An instance of Sharp
+
+Returns `GifReader` - Return a instance of GifReader Contains the following methods:
+
+#### `reader.toFrames(): Promise<Sharp[]>`
+
+Cut GIF frames.
+
+Returns `Promise<Sharp[]>` - Resolve with cutted frames (an array of instance of Sharp).
+
+#### `reader.toGif(options?: Object): Promise<Gif>`
+
+Create Gif from cutted frames.
+
+- `options` Object _(optional)_ - Options for createGif(). See [createGif](#gifcreategifoptions-object-gif).
+
+Returns `Promise<Gif>` - Resolve with an instance of Gif.
+
+A shortcut to create a Gif with the cutted frames, equal to:
+
+`GIF.createGif(options).addFrame(reader.frames || (await reader.toFrames()));`
+
+## Change Log
+
+### 0.1.3
+
+- Feature: Add `GifReader` for cutting frames.

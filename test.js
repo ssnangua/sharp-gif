@@ -4,32 +4,30 @@ const GIF = require("./index");
 
 if (!fs.existsSync("./output")) fs.mkdirSync("./output");
 
-(async () => {
-  /**
-   * Simple use case
-   */
-  // const image = await GIF.createGif()
-  //   .addFrame([
-  //     sharp("./frames/0000.png"),
-  //     sharp("./frames/0001.png"),
-  //     sharp("./frames/0002.png"),
-  //   ])
-  //   .toSharp();
-  // image.toFile("./output/frames.gif");
-  /**
-   * Trace encoding progress
-   */
-  // const image = await GIF.createGif({ delay: 20 })
-  //   .addFrame(
-  //     fs.readdirSync("./frames").map((file) => sharp(`./frames/${file}`))
-  //   )
-  //   .toSharp(({ total, encoded }) => {
-  //     console.log(`${encoded}/${total}`);
-  //   });
-  // image.toFile("./output/frames.gif");
-  /**
-   * Concat animated GIFs
-   */
+async function simpleUseCase() {
+  const image = await GIF.createGif()
+    .addFrame([
+      sharp("./frames/0000.png"),
+      sharp("./frames/0001.png"),
+      sharp("./frames/0002.png"),
+    ])
+    .toSharp();
+  image.toFile("./output/frames.gif");
+}
+
+async function traceEncodingProgress() {
+  const image = await GIF.createGif({ delay: 50 })
+    .addFrame(
+      fs.readdirSync("./frames").map((file) => sharp(`./frames/${file}`))
+    )
+    .toSharp(({ total, encoded }) => {
+      console.log(`${encoded}/${total}`);
+    });
+  image.toFile("./output/frames.gif");
+  image.toFile("./output/frames.webp");
+}
+
+async function concatAnimatedGIFs() {
   const image = await GIF.createGif({
     transparent: "#FFFFFF",
   })
@@ -40,4 +38,23 @@ if (!fs.existsSync("./output")) fs.mkdirSync("./output");
     ])
     .toSharp();
   image.toFile("./output/concat.gif");
-})();
+}
+
+async function readGif() {
+  const reader = GIF.readGif(sharp("./2.gif", { animated: true }));
+  const frames = await reader.toFrames();
+  frames.forEach((frame, index) => {
+    frame.toFile(`./output/${("000" + index).substr(-4)}.png`);
+  });
+
+  const gif = await reader.toGif({
+    transparent: "#FFFFFF",
+  });
+  const image = await gif.toSharp();
+  image.toFile("./output/remake.gif");
+}
+
+// simpleUseCase();
+// traceEncodingProgress();
+// concatAnimatedGIFs();
+// readGif();

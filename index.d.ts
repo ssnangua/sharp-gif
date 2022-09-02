@@ -101,7 +101,25 @@ export declare class Gif {
   toSharp(progress?: ProgressHandler, encoder?: GIFEncoder): Promise<Sharp>;
 }
 
+export declare class GifReader {
+  constructor(image: Sharp);
+  /**
+   * Cut GIF frames
+   */
+  toFrames(): Promise<Sharp[]>;
+  /**
+   * Create Gif from cutted frames
+   * @param options
+   */
+  toGif(options?: GifOptions): Promise<Gif>;
+}
+
 /**
- * Create gif
+ * Create Gif
  */
 export declare function createGif(options?: GifOptions): Gif;
+
+/**
+ * Read Gif
+ */
+export declare function readGif(image: Sharp): GifReader;

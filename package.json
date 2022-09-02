@@ -1,7 +1,7 @@
 {
   "name": "sharp-gif",
-  "version": "0.1.2",
-  "description": "Generate animated GIF for sharp base on gif-encoder.",
+  "version": "0.1.3",
+  "description": "Generate animated GIF/WebP for sharp base on gif-encoder.",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },

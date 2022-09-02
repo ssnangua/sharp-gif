@@ -1,6 +1,38 @@
 const sharp = require("sharp");
 const GifEncoder = require("gif-encoder");
 
+class GifReader {
+  constructor(image) {
+    this.image = image;
+  }
+
+  async toFrames() {
+    let { image } = this;
+    const { pages, width, pageHeight } = await image.metadata();
+    const frames = [];
+    if (pages > 1) {
+      image = sharp(await image.png().toBuffer());
+      for (let i = 0; i < pages; i++) {
+        const frame = image.clone().extract({
+          left: 0,
+          top: pageHeight * i,
+          width: width,
+          height: pageHeight,
+        });
+        frames.push(sharp(await frame.toBuffer()));
+      }
+    } else {
+      frames.push(image);
+    }
+    this.frames = frames;
+    return frames;
+  }
+
+  async toGif(options = {}) {
+    return new Gif(options).addFrame(this.frames || (await this.toFrames()));
+  }
+}
+
 class Gif {
   constructor(options = {}) {
     this.options = options;
@@ -73,7 +105,8 @@ class Gif {
     encoder.writeHeader();
 
     // Write out a new frame to the GIF.
-    const addFrame = async (frame, frameWidth, frameHeight) => {
+    const addFrame = async (frame) => {
+      const { width: frameWidth, height: frameHeight } = await frame.metadata();
       if (frameWidth !== width && frameHeight !== height) {
         // Resize frame
         if (resizeType === "zoom") {
@@ -112,31 +145,14 @@ class Gif {
       encoder.addFrame(pixels);
     };
 
-    // Parse animated frames
+    // Parse frames
     for (let i = 0; i < frames.length; i++) {
-      let frame = frames[i];
-      const { pages, width, height, pageHeight } =
-        (meta && meta[i]) || (await frame.metadata());
-      if (pages > 1) {
-        frame = sharp(await frame.png().toBuffer());
-        for (let p = 0; p < pages; p++) {
-          const cutFrame = frame.clone().extract({
-            left: 0,
-            top: pageHeight * p,
-            width: width,
-            height: pageHeight,
-          });
-          _frames.push({ frame: cutFrame, width, height: pageHeight });
-        }
-      } else {
-        _frames.push({ frame, width, height });
-      }
+      _frames.push(...(await new GifReader(frames[i]).toFrames()));
     }
 
-    // Write all frames
+    // Write out frames
     for (let i = 0; i < _frames.length; i++) {
-      let { frame, width, height } = _frames[i];
-      await addFrame(frame, width, height);
+      await addFrame(_frames[i]);
     }
 
     // Write out footer bytes.
@@ -159,4 +175,5 @@ class Gif {
 
 module.exports = {
   createGif: (options = {}) => new Gif(options),
+  readGif: (image) => new GifReader(image),
 };
