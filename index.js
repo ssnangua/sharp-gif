@@ -64,6 +64,8 @@ class Gif {
       extendBackground = { r: 0, g: 0, b: 0, alpha: 0 },
       rawOptions,
     } = options;
+    const cutted = [];
+    const bufs = [];
 
     // Exclude inside and outside fit
     const { fit } = resizeOptions;
@@ -71,10 +73,14 @@ class Gif {
       resizeOptions.fit = "contain";
     }
 
+    // Parse frames
+    for (let i = 0; i < frames.length; i++) {
+      cutted.push(...(await new GifReader(frames[i]).toFrames()));
+    }
+
     // Get width and height of output gif
-    let meta;
     if (!encoder && (!width || !height)) {
-      meta = await Promise.all(frames.map((frame) => frame.metadata()));
+      const meta = await Promise.all(frames.map((frame) => frame.metadata()));
       const math = resizeTo === "largest" ? Math.max : Math.min;
       width = width || math(...meta.map((m) => m.width));
       height = height || math(...meta.map((m) => m.pageHeight || m.height));
@@ -89,12 +95,10 @@ class Gif {
       if (transparent) encoder.setTransparent(transparent);
     }
 
-    const _frames = [];
-    const bufs = [];
     encoder.on("data", (buffer) => {
       bufs.push(buffer);
       // Call progress handler
-      progress({ total: _frames.length + 2, encoded: bufs.length });
+      progress({ total: cutted.length + 2, encoded: bufs.length });
     });
     const promise = new Promise((resolve, reject) => {
       encoder.on("end", () => resolve(Buffer.concat(bufs)));
@@ -104,8 +108,9 @@ class Gif {
     // Write out header bytes.
     encoder.writeHeader();
 
-    // Write out a new frame to the GIF.
-    const addFrame = async (frame) => {
+    // Write out frames
+    for (let i = 0; i < cutted.length; i++) {
+      const frame = cutted[i];
       const { width: frameWidth, height: frameHeight } = await frame.metadata();
       if (frameWidth !== width && frameHeight !== height) {
         // Resize frame
@@ -143,16 +148,6 @@ class Gif {
 
       const pixels = await frame.ensureAlpha(0).raw(rawOptions).toBuffer();
       encoder.addFrame(pixels);
-    };
-
-    // Parse frames
-    for (let i = 0; i < frames.length; i++) {
-      _frames.push(...(await new GifReader(frames[i]).toFrames()));
-    }
-
-    // Write out frames
-    for (let i = 0; i < _frames.length; i++) {
-      await addFrame(_frames[i]);
     }
 
     // Write out footer bytes.
