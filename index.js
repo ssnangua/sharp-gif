@@ -112,7 +112,7 @@ class Gif {
     for (let i = 0; i < cutted.length; i++) {
       const frame = cutted[i];
       const { width: frameWidth, height: frameHeight } = await frame.metadata();
-      if (frameWidth !== width && frameHeight !== height) {
+      if (frameWidth !== width || frameHeight !== height) {
         // Resize frame
         if (resizeType === "zoom") {
           frame.resize({

@@ -186,3 +186,7 @@ A shortcut to create a Gif with the cutted frames, equal to:
 ### 0.1.3
 
 - Feature: Add `GifReader` for cutting frames.
+
+### 0.1.5
+
+- Fix: Resize bug.
