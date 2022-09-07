@@ -16,6 +16,7 @@ async function simpleUseCase() {
 }
 
 async function traceEncodingProgress() {
+  const now = Date.now();
   const image = await GIF.createGif({ delay: 50 })
     .addFrame(
       fs.readdirSync("./frames").map((file) => sharp(`./frames/${file}`))
@@ -23,6 +24,7 @@ async function traceEncodingProgress() {
     .toSharp(({ total, encoded }) => {
       console.log(`${encoded}/${total}`);
     });
+  console.log(Date.now() - now);
   image.toFile("./output/frames.gif");
   image.toFile("./output/frames.webp");
 }
@@ -55,6 +57,6 @@ async function readGif() {
 }
 
 // simpleUseCase();
-// traceEncodingProgress();
+traceEncodingProgress();
 // concatAnimatedGIFs();
 // readGif();

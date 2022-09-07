@@ -1,3 +1,7 @@
+**Note:** you can try [sharp-gif2](https://www.npmjs.com/package/sharp-gif2) first, it is base on [gifenc](https://www.npmjs.com/package/gifenc), has faster encoding speed.
+
+---
+
 # sharp-gif
 
 Generate animated GIF/WebP for [sharp](https://www.npmjs.com/package/sharp) base on [gif-encoder](https://www.npmjs.com/package/gif-encoder).
