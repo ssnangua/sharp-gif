@@ -146,7 +146,7 @@ class Gif {
         }
       }
 
-      const pixels = await frame.ensureAlpha(0).raw(rawOptions).toBuffer();
+      const pixels = await frame.ensureAlpha().raw(rawOptions).toBuffer();
       encoder.addFrame(pixels);
     }
 

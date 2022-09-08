@@ -58,5 +58,5 @@ async function readGif() {
 
 // simpleUseCase();
 traceEncodingProgress();
-// concatAnimatedGIFs();
-// readGif();
+concatAnimatedGIFs();
+readGif();
